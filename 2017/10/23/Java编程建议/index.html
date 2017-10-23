@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java编程建议 | code_blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="不要覆写静态方法，但可以隐藏。而且，不能用override注解。建议：不要通过实例对象访问静态方法或静态属性，这不是一个好习惯。because:实例对象有两个类型：表面类型（Apparent Type）和实际类型（Actual Type），表面类型是声明时的类型，实际类型是对象产生时的类型， 比如我们例子，Base base=new Sub（）；变量base的表面类型是Base，实际类型是Sub">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java编程建议">
+<meta property="og:url" content="http://blueberry.ml/2017/10/23/Java编程建议/index.html">
+<meta property="og:site_name" content="code_blog">
+<meta property="og:description" content="不要覆写静态方法，但可以隐藏。而且，不能用override注解。建议：不要通过实例对象访问静态方法或静态属性，这不是一个好习惯。because:实例对象有两个类型：表面类型（Apparent Type）和实际类型（Actual Type），表面类型是声明时的类型，实际类型是对象产生时的类型， 比如我们例子，Base base=new Sub（）；变量base的表面类型是Base，实际类型是Sub">
+<meta property="og:updated_time" content="2017-10-23T03:08:45.912Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java编程建议">
+<meta name="twitter:description" content="不要覆写静态方法，但可以隐藏。而且，不能用override注解。建议：不要通过实例对象访问静态方法或静态属性，这不是一个好习惯。because:实例对象有两个类型：表面类型（Apparent Type）和实际类型（Actual Type），表面类型是声明时的类型，实际类型是对象产生时的类型， 比如我们例子，Base base=new Sub（）；变量base的表面类型是Base，实际类型是Sub">
+  
+    <link rel="alternate" href="/atom.xml" title="code_blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">code_blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blueberry.ml"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Java编程建议" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/23/Java编程建议/" class="article-date">
+  <time datetime="2017-10-23T02:06:08.000Z" itemprop="datePublished">2017-10-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java编程建议
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li>不要覆写静态方法，但可以隐藏。而且，不能用override注解。建议：不要通过实例对象访问静态方法或静态属性，这不是一个好习惯。because:实例对象有两个类型：表面类型（Apparent Type）和实际类型（Actual Type），表面类型是声明时的类型，实际类型是对象产生时的类型，<ul>
+<li>比如我们例子，Base base=new Sub（）；<br>变量base的表面类型是Base，实际类型是Sub。对于非静态方法，它是根据对象的实际类型来执行的，也就是执行了Sub类中的doAnything方法。而对于静态方法来说就比较特殊了，首先静态方法不依赖实例对象，它是通过类名访问的；其次，可以通过对象访问静态方法，如果是通过对象调用静态方法，JVM则会通过对象的表面类型查找到静态方法的入口，继而执行之</li>
+</ul>
+</li>
+<li>构造函数尽量简化，应该达到一眼洞穿的地步：初始化变量、声明实例的上下文。<ul>
+<li>子类的有参构造中默认包含了super()方法，会调用父类的无参构造函数。</li>
+<li>子类的实例化过程：首先初始化父类（注意，这不是生成父类对象），也就是初始化父类的变量，调用父类的构造函数，然后，才会初始化子类的变量，调用子类自己的构造函数，最后生成一个实例对象。</li>
+</ul>
+</li>
+<li>不要在构造函数中声明初始化其他类，养成好的习惯</li>
+<li>使用构造代码块精炼程序。编译器会把构造代码块插入到每个构造函数的最前端。Java不会把构造代码块插入到有调用其他构造函数的构造函数中，为了确保每个构造函数只执行一次构造代码块。<ul>
+<li>在Java中一共有四种类型的代码块：</li>
+<li><ul>
+<li>普通代码块 就是在方法后面使用“{}”括起来的代码片段，它不能单独执行，必须通过方法名调用执行。 </li>
+</ul>
+</li>
+<li><ul>
+<li>静态代码块 在类中使用static修饰，并使用“{}”括起来的代码片段，用于静态变量的初始化或对象创建前的环境初始化。 </li>
+</ul>
+</li>
+<li><ul>
+<li>同步代码块 使用synchronized关键字修饰，并使用“{}”括起来的代码片段，它表示同一时间只能有一个线程进入到该方法块中，是一种多线程保护机制。 </li>
+</ul>
+</li>
+<li><ul>
+<li>构造代码块 在类中没有任何的前缀或后缀，并使用“{}”括起来的代码片段。</li>
+</ul>
+</li>
+<li>我们就可以把构造代码块应用到如下场景中：</li>
+<li><ul>
+<li>初始化实例变量（Instance Variable） </li>
+</ul>
+</li>
+<li><ul>
+<li>初始化实例环境<br>一个对象必须在适当的场景下才能存在，如果没有适当的场景，则就需要在创建对象时创建此场景，例如在JEE开发中，要产生HTTP Request必须首先建立HTTP Session，在创建HTTP Request时就可以通过构造代码块来检查HTTP Session是否已经存在，不存在则创建之。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>静态内部类与普通内部类有什么区别呢？区别如下： </p>
+<ul>
+<li>静态内部类不持有外部类的引用 </li>
+<li>静态内部类不依赖外部类 </li>
+<li>普通内部类不能声明static的方法和变量</li>
+<li><ul>
+<li>普通内部类不能声明static的方法和变量，注意这里说的是变量，常量（也就是final static修饰的属性）还是可以的，而静态内部类形似外部类，没有任何限制。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>使用匿名类的构造函数</p>
+<ul>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">List l2=<span class="keyword">new</span> ArrayList（）&#123;&#125;；可以编译。：一个匿名类的声明和赋值。其代码类似于：<span class="comment">//定义一个继承ArrayList的内部类 </span></div><div class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Sub</span> <span class="keyword">extends</span> <span class="title">ArrayList</span></span>&#123;</div><div class="line">  &#125; </div><div class="line">  List l2=<span class="keyword">new</span> Sub（）；<span class="comment">//声明和赋值</span></div></pre></td></tr></table></figure>
+</li>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">List l3=<span class="keyword">new</span> ArrayList（）&#123;&#123;&#125;&#125;；可以编译，其代码类似于：</div><div class="line"><span class="comment">//定义一个继承ArrayList的内部类</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sub</span> <span class="keyword">extends</span> <span class="title">ArrayList</span></span>&#123; </div><div class="line">   &#123; </div><div class="line">    	<span class="comment">//初始化块 </span></div><div class="line">   &#125;</div><div class="line">&#125; </div><div class="line">List l3=<span class="keyword">new</span> Sub（）；<span class="comment">//声明和赋值</span></div></pre></td></tr></table></figure>
+<pre><code>构造函数的名称和类名相同，那问题来了：匿名类的构造函数是什么呢？它没有名字呀！很显然，初始化块就是它的构造函数。当然，一个类中的构造函数块可以是多个，也就是说可以出现如下代码：`List l3=new ArrayList（）{{}{}{}{}{}}；`
+</code></pre></li>
+<li><p>匿名类的构造函数有特殊处理机制，一般类（也就是具有显式名字的类）的所有构造函数默认都是调用父类的无参构造的，而匿名类因为没有名字，只能由构造代码块代替，也就无所谓的有参和无参构造函数了，它在初始化时直接调用了父类的同参数构造，然后再调用了自己的构造代码块。</p>
+</li>
+</ul>
+</li>
+<li><p>使用内部类，让多重继承成为可能。内部类的一个重要特性：内部类可以继承一个与外部类无关的类，保证了内部类的独立性，正是基于这一点，多重继承才会成为可能。可以使用 成员内部类（也叫做实例内部类，Instance Inner Class），或者匿名内部类来实现。</p>
+</li>
+<li><p>让工具类不可实例化。将构造方法设为private（不保险，可以使用反射，修改访问权限）,此外，在构造函数里抛出异常，比如：<code>throw new Error(&quot;不要实例化我! &quot;)</code>;</p>
+</li>
+<li><p>避免对象的浅拷贝。我们知道一个类实现了Cloneable接口，覆写clone()方法，就完全具备拷贝能力。但是，注意：在clone()方法中调用Object提供的一个对象拷贝的默认方法：<code>super.clone()</code>，是不靠谱的。它是有选择性的拷贝，它的拷贝规则如下：</p>
+<ul>
+<li>基本类型</li>
+<li><ul>
+<li>如果变量是基本类型，则拷贝其值，比如int、float等。</li>
+</ul>
+</li>
+<li>对象 </li>
+<li><ul>
+<li>如果变量是一个实例对象，则拷贝地址引用，也就是说此时新拷贝出的对象与原有对象共享该实例变量，不受访问权限的限制。这在Java中是很疯狂的，因为它突破了访问权限的定义：一个private修饰的变量，竟然可以被两个不同的实例对象访问，这让Java的访问权限体系情何以堪！ </li>
+</ul>
+</li>
+<li>String字符串 </li>
+<li><ul>
+<li>这个比较特殊，拷贝的也是一个地址，是个引用，但是在修改时，它会从字符串池（String Pool）中重新生成新的字符串，原有的字符串对象保持不变，在此处我们可以认为String是一个基本类型。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>推荐使用序列化实现对象的拷贝。被拷贝的对象必须实现Serializable接口，并显示声明SerialVersionUID。注意两点：1. 对象的内部属性都要求是可序列化的 2. 注意方法和属性的特殊修饰符。（final、static变量的序列化问题，transient变量不会进行序列化）</p>
+<ul>
+<li>推荐使用Apache下的commons工具包中的SerializationUtils类，非常简洁方便</li>
+</ul>
+</li>
+<li><ul>
+<li>equals应该考虑null值情景。 比如在List<person>中加入 p2=new person(null)的实例，当调用list.contains(p2)时将报空指针的错误，而contains是遍历整个list来调用equals(p2)来判断是否存在相等的，所以equals处应该处理null</person></li>
+<li>在equals中使用getClass进行类型判断。若使用instanceof，会因为继承的原因，导致判断出错。</li>
+</ul>
+</li>
+<li><p>覆写equals方法必须覆写hashCode方法。==(基本上每个Javaer都知道)== 秦小波. 改善Java程序的151个建议 -48个建议 (Kindle 位置 2069-2075).  </p>
+<ul>
+<li>HashMap的底层处理机制是以数组的方式保存Map条目（Map Entry）的，这其中的关键是这个数组下标的处理机制：依据传入元素hashCode方法的返回值决定其数组的下标，如果该数组位置上已经有了Map条目，且与传入的键值相等则不处理，若不相等则覆盖；如果数组位置没有条目，则插入，并加入到Map条目的链表中。同理，检查键是否存在也是根据哈希码确定位置，然后遍历查找键值的。 </li>
+<li>对象元素的hashCode方法返回的是什么值呢？它是一个对象的哈希码，是由Object类的本地方法生成的，确保每个对象有一个哈希码（这也是哈希算法的基本要求：任意输入k，通过一定算法f（k），将其转换为非可逆的输出，对于两个输入k1和k2，要求若k1=k2，则必须f（k1）=f（k2），但也允许k1≠k2，f（k1）=f（k2）的情况存在）。</li>
+<li>那回到我们的例子上，由于我们没有重写hashCode方法，两个张三对象的hashCode方法返回值（也就是哈希码）肯定是不相同的了，在HashMap的数组中也就找不到对应的Map条目了，于是就返回了false。问题清楚了，修改也非常简单，重写一下hashCode方法即可，代码如下：</li>
+<li><ul>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span></span>&#123; /其他代码相同，不再赘述/</div><div class="line"><span class="meta">@Override</span> <span class="keyword">public</span> <span class="keyword">int</span> hashCode（）&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> HashCodeBuilder（）.append（name）.toHashCode（）；</div><div class="line">&#125;</div><div class="line">&#125; 其中HashCodeBuilder是org.apache.commons.lang.builder包下的一个哈希码生成工具，使用起来非常方便，诸位可以直接在项目中集成。</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>推荐覆写toString方法 。</p>
+<ul>
+<li>在Web项目中，当Bean的属性较多时，自己实现就不可取了。可以使用apache的commons工具包中的ToStringBuilder类，简洁、实用又方便。</li>
+<li>可能有读者要说了，为什么通过println方法打印一个对象会调用toString方法？那是源于println的实现机制：如果是一个原始类型就直接打印，如果是一个类类型，则打印出其toString方法的返回值，如此而已！</li>
+</ul>
+</li>
+<li><p>使用package-info类为包服务</p>
+</li>
+<li><ul>
+<li>虽然Java的每个对象都保存在堆内存中，但字符串池非常特殊，它在编译期已经决定了其存在JVM的常量池(Constant Pool)</li>
+<li>当<code>String str=new String(&quot;中国&quot;);</code> 不会检查字符串池中是否已存在，也不会把对象放到池中。并且，str.intern()方法将检查当前的对象在对象池中是否有字面值相同的引用对象，如果有则返回池中的对象，如果没有则将str放入对象池中，并返回当前对象。</li>
+</ul>
+</li>
+<li><code>string.replaceAll</code>的第一个参数是正则表达式<ul>
+<li><code>string.replace</code>是replaceAll的简化版，可以传递两个string参数进行替换</li>
+</ul>
+</li>
+<li>对一个字符串进行拼接有三种方法：<ul>
+<li>加号 虽然编译器对加号做了优化，它会使用StringBuilder的append方法进行追加。但每次它都会创建一个StringBuilder对象，对在append完后调用toString方法。<br>  <code>str=new StringBuilder(str).append(&quot;c&quot;).toString();</code></li>
+<li>concat  前面都是在字符数组char buf[]上的原子性操作，速度很快。但最后，它return会新建一个String对象:<code>return new String (0, count+otherLen, buf);</code></li>
+<li>StringBuidler或则StringBuffer的append方法</li>
+</ul>
+</li>
+<li><p>推荐使用正则表达式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Pattern pattern=Pattern.compile(<span class="string">"\\\b\\\w+\\\b"</span>);<span class="comment">//正则表达式对象 。Matcher matcher=pattern.matcher(str); //生存匹配器 int wordsCount=0;//记录单词数量 while(matcher.find())&#123; wordsCount++;&#125; //遍历查找匹配，统计单词数量</span></div></pre></td></tr></table></figure>
+<ul>
+<li>\b表示的是一个单词的边界，它是一个位置界定符，一边为字符或数字，另一边为非字符或数字</li>
+<li>\w表示的是字符或数字</li>
+</ul>
+</li>
+<li><p>若有必要，使用变长数组。 对数组扩容：</p>
+<ul>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span>＜T＞ T[] expandCapacity（T[] datas, <span class="keyword">int</span> newLen）&#123; </div><div class="line">  <span class="comment">//不能是负值</span></div><div class="line">  newLen=newLen＜<span class="number">0</span>?<span class="number">0</span>：newLen； </div><div class="line">  <span class="comment">//生成一个新数组，并拷贝原值 </span></div><div class="line">  <span class="keyword">return</span> Arrays.copyOf（datas, newLen）； &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>注意copyOf是浅拷贝</p>
+</li>
+</ul>
+</li>
+<li>在明确的场景下，为集合指定初始容量<ul>
+<li>ArraryList的elementDate数组的默认长度是10，之后1.5倍扩容，16、25 …</li>
+<li>推荐： <code>new ArrayList&lt;Student&gt; (75)</code></li>
+</ul>
+</li>
+<li><ul>
+<li>查找最大值</li>
+<li><ul>
+<li>自行实现，在in[] data 上遍历，查找最大值</li>
+</ul>
+</li>
+<li><ul>
+<li>使用Arrarys 先排序，后取值 Arrays.sort(data.clone()); return data[data.length-1];   先使用data.clone拷贝是因为输入的数组也是一个对象，不拷贝的化，会改变原有数组元素的顺序。</li>
+</ul>
+</li>
+<li>查找倒数第二大的值。 因为最大值可能有多个，所以上面的方法行不通。</li>
+<li><ul>
+<li>数组不能剔除重复数据，但Set集合却可以。并且子类TreeSet还能自动排序。</li>
+</ul>
+</li>
+<li><ul>
+<li>​<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> getSecond（Integer[]data）&#123; <span class="comment">//转换为列表</span></div><div class="line">  List＜Integer＞ dataList=Arrays.asList（data）；</div><div class="line">    <span class="comment">//转换为TreeSet，删除重复元素并升序排列</span></div><div class="line">    TreeSet＜Integer＞ts=<span class="keyword">new</span> TreeSet＜Integer＞（dataList）； <span class="comment">//取得比最大值小的最大值，也就是老二了 </span></div><div class="line">    <span class="keyword">return</span> ts.lower（ts.last（））；</div><div class="line">     &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>避免基本类型数组转化成列表时的陷阱</p>
+<ul>
+<li>Arrays.asList的输入参数为一个泛型变长参数</li>
+<li>8个基本类型是不能泛型化的。</li>
+<li>int[] a 数组是一个对象，是可以泛型化的。 所以Arrays.asList(a)；没有报错，并且将整个数组作为list的第一个元素了。 因此要使用Integer[] a ={1,2,3,4,5};</li>
+</ul>
+</li>
+<li><p>asList方法产生的List对象不可更改</p>
+<ul>
+<li><p>Arrays工具类的asList方法的源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span>＜T＞ List＜T＞ asList（T……a）&#123; </div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ArrayList＜T＞（a）；</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p> 直接new了一个ArrayList对象返回，难道ArrayList不支持add方法？问题就出在这个ArrayList类上，此ArrayList非<code>java.util.ArrayList</code>，而是Arrays工具类的一个静态私有内部类。它仅仅实现了5个方法：size,toArray,get,set,contains。没有add,remove。若强行调用add，将调用其父类AbstractList的add方法，其直接抛出UnsupportedOperationException</p>
+</li>
+<li>总结，asList生成的list，只能用来读操作</li>
+</ul>
+</li>
+<li><p>ArrayList数组实现了RandomAccess接口（随机存取接口），这也就标志着ArrayList是一个可以随机存取的列表。在Java中，RandomAccess和Cloneable、Serializable一样，都是标志性接口，不需要任何实现，只是用来表明其实现类具有某种特质的，实现了Cloneable表明可以被拷贝，实现了Serializable接口表明被序列化了，实现了RandomAccess则表明这个类可以随机存取，对我们的ArrayList来说也就标志着其数据元素之间没有关联，即两个位置相邻的元素之间没有相互依赖和索引关系，可以随机访问和存储。</p>
+<ul>
+<li>因此，使用下标遍历arrayList效率非常高，而使用foreach则是使用的iterator非常耗时</li>
+<li>LinkedList不是随机存取的，且前后数据项有引用，使用foreach非常快。而用下标非常慢</li>
+</ul>
+</li>
+<li><p>列表间相等判断只关心所拥有的元素数据</p>
+<ul>
+<li>ArrayList、Vector都继承了AbstractList抽象类，它的equals方法只要求所有元素相等，个数一致。</li>
+<li>其他的集合类型，如Set、Map等与此相同，也是只关心集合元素，不用考虑集合类型</li>
+</ul>
+</li>
+<li><p>子列表只是原列表的一个视图。list.subList的源码：</p>
+<ul>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> List＜E＞ subList（<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex）&#123;</div><div class="line"><span class="keyword">return</span>（<span class="keyword">this</span> <span class="keyword">instanceof</span> RandomAccess ? <span class="keyword">new</span> RandomAccessSubList＜E＞（<span class="keyword">this</span>, fromIndex, toIndex）：<span class="keyword">new</span> SubList＜E＞（<span class="keyword">this</span>, fromIndex, toIndex））； &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>subList方法是由AbstractList实现的，它会根据是不是可以随机存取来提供不同的SubList实现方式，不过，随机存储的使用频率比较高，而且RandomAccessSubList也是SubList子类，所以所有的操作都是由SubList类实现的（除了自身的SubList方法外），并且SubList也是继承了AbstractList。（阅读源码）subList类没有新建一个新的数组或列表。</p>
+</li>
+<li><p>巧用subList处理局部列表。eg:删除索引位置为20~30的元素。<code>list.subList(20,30).clear();</code></p>
+</li>
+<li><p>生成子列表后不要再操作原列表。子列表调用size()方法，将调用checkForComodifcation方法。</p>
+<ul>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">void</span> checkForComodification（）&#123; <span class="comment">//判断当前修改计数器是否与子列表生成时一致</span></div><div class="line"><span class="keyword">if</span>（l.modCount！=expectedModCount） </div><div class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException（）； &#125;</div></pre></td></tr></table></figure>
+<p>expectedModCount是从什么地方来的呢？它是在SubList子列表的构造函数中赋值的，其值等于生成子列表时的修改次数（modCount变量）。因此在生成子列表后再修改原始列表，l.modCount的值就必然比expectedModCount大1，不再保持相等了，于是也就抛出了ConcurrentModificationException异常。</p>
+</li>
+<li>subList的其他方法也会检测修改计数器，例如set、get、add等方法，若生成子列表后，再修改原列表，这些方法也会抛出ConcurrentModificationException异常。</li>
+<li><p>解决办法，通过Collections.unmodifiableList方法设置原列表为只读状态，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main（String[]args）&#123;</div><div class="line">    List＜String＞list=<span class="keyword">new</span> ArrayList＜String＞（）； List＜String＞subList=list.subList（<span class="number">0</span>，<span class="number">2</span>）； <span class="comment">//设置列表为只读状态 list=Collections.unmodifableList（list）； //对list进行只读操作 doReadSomething（list） //对subList进行读写操作 doReadAndWriteSomething（subList） </span></div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>还有一个问题。我们的List也可以有多个视图，也就是可以有多个子列表，但==问题是只要生成的子列表多于一个，则任何一个子列表就都不能修改了==，否则就会抛出ConcurrentModificationException异常。 </p>
+</li>
+</ul>
+</li>
+<li><p>实现Comparable接口作为类的默认排序方法。Comparator接口则是一个类的扩展排序工具。</p>
+<ul>
+<li><p>实现Comparable接口，必须实现compareTo方法，eg:  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">  <span class="keyword">public</span> <span class="keyword">int</span> compareTo（Employee o）&#123; </div><div class="line">      <span class="keyword">return</span> <span class="keyword">new</span> CompareToBuilder（） .append（id, o.id）.toComparison（）； &#125;</div><div class="line">  <span class="meta">@Override</span> <span class="keyword">public</span> String toString（）&#123;</div><div class="line">      <span class="keyword">return</span> ToStringBuilder.reflectionToString（<span class="keyword">this</span>）； &#125; </div><div class="line">  </div><div class="line">这里使用apache的工具类实现，表明是按照id的升序排列的。</div></pre></td></tr></table></figure>
+</li>
+<li><p>使用Collections.sort(list); 排序</p>
+</li>
+<li>但是，有时候我们希望按照职位来排序，那怎么做呢？此时，重构Employee类已经不合适了，Employee已经是一个稳定类，为了一个排序功能修改它不是一个好办法，那有什么更好的解决办法吗？  </li>
+<li><p>有办法，看Collections.sort方法，它有一个重载方法Collections.sort（List＜T＞list, Comparator＜?super T＞c），可以接受一个Comparator实现类，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">PositionComparator</span> <span class="keyword">implements</span> <span class="title">Comparator</span>＜<span class="title">Employee</span>＞</span>&#123;</div><div class="line">  <span class="meta">@Override</span> <span class="keyword">public</span> <span class="keyword">int</span> compare（Employee o1，Employee o2）&#123; <span class="comment">//按照职位降序排列</span></div><div class="line">  <span class="keyword">return</span> o1.getPosition（）.compareTo（o2.getPosition（））； &#125; &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>调用<code>Collections.sort（list, new PositionComparator（））</code>即可实现按职位排序</p>
+</li>
+<li><p>按职位==临时==倒序排列，有两种简单的方法：</p>
+</li>
+<li><ul>
+<li>直接使用<code>Collections.reverse（List＜?＞list）</code>方法实现倒序排列。 </li>
+</ul>
+</li>
+<li><ul>
+<li><p>通过<code>Collections.sort（list, Collections.reverseOrder（new PositionComparator（）））</code>也可以实现倒序排列。</p>
+</li>
+<li><p>先按照职位排序，职位相同再按照工号排序，这如何处理？这可是我们经常遇到的实际问题。很好处理，使用apache的工具类来简化处理，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">int</span> compareTo（Employee o）&#123; </div><div class="line"><span class="keyword">return</span> <span class="keyword">new</span> CompareToBuilder（）.append（position, o.position）<span class="comment">//职位排序 .append（id, o.id）.toComparison（）；//工号排序 &#125;</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>集合中的元素必须做到compareTo和equals同步。</p>
+<ul>
+<li>indexOf依赖equals方法查找，binarySearch则依赖compareTo方法查找。</li>
+<li>在覆写euqals方法时，可以使用<code>return new EqualsBuilder().append(code,city.code).isEquals();</code>方法，简单快速实现</li>
+</ul>
+</li>
+<li><p>集合运算时使用更优雅的方式。</p>
+<ul>
+<li>并集 ： list1.addAll(list2) 把两个集合加起来</li>
+<li>交集 ： list1.retain(list2) 会删除list1中没有出现在list2中的元素</li>
+<li>差集 ： list1.removeAll(list2) 从1中删除出现在list2的元素</li>
+<li>无重复并集 ： list2.removeAll(list1);  list1.addAll(list2);</li>
+<li>集合的这些操作在持久层中使用得非常频繁，从数据库中取出的就是多个数据集合，之后我们就可以使用集合的各种方法构建我们需要的数据了，需要两个集合的and结果，那是交集，需要两个集合的or结果，那是并集，需要两个集合的not结果，那是差集。</li>
+</ul>
+</li>
+<li><p>使用shuffle打乱列表</p>
+<ul>
+<li>Collections.swap(list,i,j); 交换list中第i个元素和第j个元素</li>
+<li>Collections.shuffe(list);  直接打乱list</li>
+</ul>
+</li>
+<li><ul>
+<li>减少HashMap中元素的数量。 hashmap底层是Entry<k,v>组成的数组，每个键值对<br>就多一个Entry对象，消耗比ArrayList多。</k,v></li>
+<li>集合中的哈希码不要重复。 </li>
+<li><ul>
+<li>如果新加入的键值对的hashCode是唯一的，那直接插入的数组中，它Entry的next值则为null；如果新加入的键值对的hashCode与其他元素冲突，则替换掉数组中的当前值，并把新加入的Entry的next变量指向被替换掉的元素—于是，一个链表就生成了。</li>
+</ul>
+</li>
+<li><ul>
+<li>如果哈希码相同，它的查找效率就与ArrayList没什么两样了，遍历对比，性能会大打折扣。特别是在那些进度紧张的项目中，虽重写了hashCode方法但返回值却是固定的，此时如果把这些对象插入到HashMap中，查找就相当耗时了。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>多线程使用Vector和HashTable</p>
+<ul>
+<li>不要混淆线程安全和同步修改异常</li>
+<li><ul>
+<li>基本上所有的集合类都有一个叫做快速失败（Fail-Fast）的校验机制，当一个集合在被多个线程修改并访问时，就可能会出现ConcurrentModificationException异常，这是为了确保集合方法一致而设置的保护措施，它的实现原理就是我们经常提到的modCount修改计数器：如果在读列表时，modCount发生变化（也就是有其他线程修改）则会抛出ConcurrentModificationException异常。这与线程同步是两码事，线程同步是为了保护集合中的数据不被脏读、脏写而设置的。</li>
+</ul>
+</li>
+<li><ul>
+<li>注意看，有两个线程在卖同一张火车票，这才是线程不同步的问题，此时把ArrayList修改为Vector即可解决问题，因为Vector的每个方法前都加上了synchronized关键字，同时只会允许一个线程进入该方法，确保了程序的可靠性。</li>
+</ul>
+</li>
+<li><ul>
+<li>虽然在系统开发中我们一再说明，除非必要，否则不要使用synchronized，这是从性能的角度考虑的，但是一旦涉及多线程时（注意这里说的是真正的多线程，不是并发修改的问题，比如一个线程增加，一个线程删除，这不属于多线程的范畴），Vector会是最佳选择，当然自己在程序中加synchronized也是可行的方法。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>非基本类型的元素、后期会修改数据的、希望实现自动排序的 推荐使用List</p>
+<ul>
+<li>Treeset实现了SortedSet接口。但该接口只是在加入元素时才进行排序，后期修改数据，不会重新排序。因此，TreeSet使用于不变量的集合数据排序，比如String、Integer等类型。如何解决后期TreeSet的数据修改，没有自己重新排序的问题呢？</li>
+<li><ul>
+<li><ol>
+<li>Set集合重排序 set=new TreeSet＜Person＞（new ArrayList＜Person＞（set））；就这一句话即可重新排序。可能有读者会问，使用TreeSet（SortedSet＜E＞s）这个构造函数不是可以更好地解决问题吗？不行，该构造函数只是原Set的浅拷贝，如果里面有相同的元素，是不会重新排序的。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><ul>
+<li><ol>
+<li>彻底重构掉TreeSet，使用List解决问题。当需要排序时，使用Colletions.sort()方法</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>两种方法都可以解决我们的困境，到底哪一个是最优的呢？对于不变量的排序，例如直接量（也就是8个基本类型）、String类型等，推荐使用TreeSet，而对于可变量，例如我们自己写的类，可能会在逻辑处理中改变其排序关键值的，则建议使用List自行排序。</p>
+</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blueberry.ml/2017/10/23/Java编程建议/" data-id="cj93mjutx0001vowi3nwjc0av" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/java/">java</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/10/23/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/">java</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/java/" style="font-size: 10px;">java</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/10/23/Java编程建议/">Java编程建议</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/23/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 lzhb<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
