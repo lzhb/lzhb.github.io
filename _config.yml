@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: code_blog
 subtitle:
-description:
-author: John Doe
+description: java android c++ algorithm
+author: lzhb
 language:
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://blueberry.ml
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -77,4 +77,6 @@ theme: landscape
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:lzhb/lzhb.github.io.git
+  branch: master
