@@ -2,30 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://blog.blueberry.ml/2017/10/27/java%E7%BC%96%E7%A8%8B%E5%BB%BA%E8%AE%AE%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>
+    
+    <lastmod>2017-10-27T12:23:10.160Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://blog.blueberry.ml/tags/index.html</loc>
     
-    <lastmod>2017-10-27T09:19:05.793Z</lastmod>
+    <lastmod>2017-10-27T12:21:20.096Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://blog.blueberry.ml/categories/index.html</loc>
     
-    <lastmod>2017-10-27T09:18:49.881Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://blog.blueberry.ml/about/index.html</loc>
-    
-    <lastmod>2017-10-27T09:18:34.153Z</lastmod>
+    <lastmod>2017-10-27T12:21:20.095Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://blog.blueberry.ml/2017/10/23/Java%E7%BC%96%E7%A8%8B%E5%BB%BA%E8%AE%AE/</loc>
     
-    <lastmod>2017-10-23T03:08:45.912Z</lastmod>
+    <lastmod>2017-10-27T12:21:20.094Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://blog.blueberry.ml/about/index.html</loc>
+    
+    <lastmod>2017-10-27T12:21:20.094Z</lastmod>
     
   </url>
   
