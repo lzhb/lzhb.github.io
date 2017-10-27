@@ -1,0 +1,234 @@
+---
+title: Java编程建议
+date: 2017-10-23 10:06:08
+tags: java
+
+---
+1. 不要覆写静态方法，但可以隐藏。而且，不能用override注解。建议：不要通过实例对象访问静态方法或静态属性，这不是一个好习惯。because:实例对象有两个类型：表面类型（Apparent Type）和实际类型（Actual Type），表面类型是声明时的类型，实际类型是对象产生时的类型，
+   + 比如我们例子，Base base=new Sub（）；
+     变量base的表面类型是Base，实际类型是Sub。对于非静态方法，它是根据对象的实际类型来执行的，也就是执行了Sub类中的doAnything方法。而对于静态方法来说就比较特殊了，首先静态方法不依赖实例对象，它是通过类名访问的；其次，可以通过对象访问静态方法，如果是通过对象调用静态方法，JVM则会通过对象的表面类型查找到静态方法的入口，继而执行之
+2. 构造函数尽量简化，应该达到一眼洞穿的地步：初始化变量、声明实例的上下文。
+   + 子类的有参构造中默认包含了super()方法，会调用父类的无参构造函数。
+   + 子类的实例化过程：首先初始化父类（注意，这不是生成父类对象），也就是初始化父类的变量，调用父类的构造函数，然后，才会初始化子类的变量，调用子类自己的构造函数，最后生成一个实例对象。
+3. 不要在构造函数中声明初始化其他类，养成好的习惯
+4. 使用构造代码块精炼程序。编译器会把构造代码块插入到每个构造函数的最前端。Java不会把构造代码块插入到有调用其他构造函数的构造函数中，为了确保每个构造函数只执行一次构造代码块。
+    + 在Java中一共有四种类型的代码块：
+    + + 普通代码块 就是在方法后面使用“{}”括起来的代码片段，它不能单独执行，必须通过方法名调用执行。 
+    + + 静态代码块 在类中使用static修饰，并使用“{}”括起来的代码片段，用于静态变量的初始化或对象创建前的环境初始化。 
+    + + 同步代码块 使用synchronized关键字修饰，并使用“{}”括起来的代码片段，它表示同一时间只能有一个线程进入到该方法块中，是一种多线程保护机制。 
+    + + 构造代码块 在类中没有任何的前缀或后缀，并使用“{}”括起来的代码片段。
+    + 我们就可以把构造代码块应用到如下场景中：
+    + + 初始化实例变量（Instance Variable） 
+    + + 初始化实例环境 
+        一个对象必须在适当的场景下才能存在，如果没有适当的场景，则就需要在创建对象时创建此场景，例如在JEE开发中，要产生HTTP Request必须首先建立HTTP Session，在创建HTTP Request时就可以通过构造代码块来检查HTTP Session是否已经存在，不存在则创建之。
+5. 静态内部类与普通内部类有什么区别呢？区别如下： 
+    + 静态内部类不持有外部类的引用 
+    + 静态内部类不依赖外部类 
+    + 普通内部类不能声明static的方法和变量
+    + + 普通内部类不能声明static的方法和变量，注意这里说的是变量，常量（也就是final static修饰的属性）还是可以的，而静态内部类形似外部类，没有任何限制。
+
+6. 使用匿名类的构造函数
+    + ```java
+      List l2=new ArrayList（）{}；可以编译。：一个匿名类的声明和赋值。其代码类似于：//定义一个继承ArrayList的内部类 
+        class Sub extends ArrayList{
+        } 
+        List l2=new Sub（）；//声明和赋值
+      ```
+    + ```java
+        List l3=new ArrayList（）{{}}；可以编译，其代码类似于：
+        //定义一个继承ArrayList的内部类
+        class Sub extends ArrayList{ 
+           { 
+            	//初始化块 
+           }
+        } 
+        List l3=new Sub（）；//声明和赋值
+        ```
+          构造函数的名称和类名相同，那问题来了：匿名类的构造函数是什么呢？它没有名字呀！很显然，初始化块就是它的构造函数。当然，一个类中的构造函数块可以是多个，也就是说可以出现如下代码：`List l3=new ArrayList（）{{}{}{}{}{}}；`
+
+    + 匿名类的构造函数有特殊处理机制，一般类（也就是具有显式名字的类）的所有构造函数默认都是调用父类的无参构造的，而匿名类因为没有名字，只能由构造代码块代替，也就无所谓的有参和无参构造函数了，它在初始化时直接调用了父类的同参数构造，然后再调用了自己的构造代码块。
+
+7. 使用内部类，让多重继承成为可能。内部类的一个重要特性：内部类可以继承一个与外部类无关的类，保证了内部类的独立性，正是基于这一点，多重继承才会成为可能。可以使用 成员内部类（也叫做实例内部类，Instance Inner Class），或者匿名内部类来实现。
+
+8. 让工具类不可实例化。将构造方法设为private（不保险，可以使用反射，修改访问权限）,此外，在构造函数里抛出异常，比如：`throw new Error("不要实例化我! ")`;
+9. 避免对象的浅拷贝。我们知道一个类实现了Cloneable接口，覆写clone()方法，就完全具备拷贝能力。但是，注意：在clone()方法中调用Object提供的一个对象拷贝的默认方法：`super.clone()`，是不靠谱的。它是有选择性的拷贝，它的拷贝规则如下：
+    + 基本类型
+    + + 如果变量是基本类型，则拷贝其值，比如int、float等。
+    + 对象 
+    + + 如果变量是一个实例对象，则拷贝地址引用，也就是说此时新拷贝出的对象与原有对象共享该实例变量，不受访问权限的限制。这在Java中是很疯狂的，因为它突破了访问权限的定义：一个private修饰的变量，竟然可以被两个不同的实例对象访问，这让Java的访问权限体系情何以堪！ 
+    + String字符串 
+    + + 这个比较特殊，拷贝的也是一个地址，是个引用，但是在修改时，它会从字符串池（String Pool）中重新生成新的字符串，原有的字符串对象保持不变，在此处我们可以认为String是一个基本类型。
+
+10. 推荐使用序列化实现对象的拷贝。被拷贝的对象必须实现Serializable接口，并显示声明SerialVersionUID。注意两点：1. 对象的内部属性都要求是可序列化的 2. 注意方法和属性的特殊修饰符。（final、static变量的序列化问题，transient变量不会进行序列化）
+  + 推荐使用Apache下的commons工具包中的SerializationUtils类，非常简洁方便
+
+11. + equals应该考虑null值情景。 比如在List<person>中加入 p2=new person(null)的实例，当调用list.contains(p2)时将报空指针的错误，而contains是遍历整个list来调用equals(p2)来判断是否存在相等的，所以equals处应该处理null
+    + 在equals中使用getClass进行类型判断。若使用instanceof，会因为继承的原因，导致判断出错。
+12. 覆写equals方法必须覆写hashCode方法。==(基本上每个Javaer都知道)== 秦小波. 改善Java程序的151个建议 -48个建议 (Kindle 位置 2069-2075).  
+    + HashMap的底层处理机制是以数组的方式保存Map条目（Map Entry）的，这其中的关键是这个数组下标的处理机制：依据传入元素hashCode方法的返回值决定其数组的下标，如果该数组位置上已经有了Map条目，且与传入的键值相等则不处理，若不相等则覆盖；如果数组位置没有条目，则插入，并加入到Map条目的链表中。同理，检查键是否存在也是根据哈希码确定位置，然后遍历查找键值的。 
+    + 对象元素的hashCode方法返回的是什么值呢？它是一个对象的哈希码，是由Object类的本地方法生成的，确保每个对象有一个哈希码（这也是哈希算法的基本要求：任意输入k，通过一定算法f（k），将其转换为非可逆的输出，对于两个输入k1和k2，要求若k1=k2，则必须f（k1）=f（k2），但也允许k1≠k2，f（k1）=f（k2）的情况存在）。
+    + 那回到我们的例子上，由于我们没有重写hashCode方法，两个张三对象的hashCode方法返回值（也就是哈希码）肯定是不相同的了，在HashMap的数组中也就找不到对应的Map条目了，于是就返回了false。问题清楚了，修改也非常简单，重写一下hashCode方法即可，代码如下：
+    + + ```java
+        class Person{ /其他代码相同，不再赘述/
+        @Override public int hashCode（）{
+            return new HashCodeBuilder（）.append（name）.toHashCode（）；
+        }
+        } 其中HashCodeBuilder是org.apache.commons.lang.builder包下的一个哈希码生成工具，使用起来非常方便，诸位可以直接在项目中集成。
+        ```
+13. 推荐覆写toString方法 。
+    + 在Web项目中，当Bean的属性较多时，自己实现就不可取了。可以使用apache的commons工具包中的ToStringBuilder类，简洁、实用又方便。
+    + 可能有读者要说了，为什么通过println方法打印一个对象会调用toString方法？那是源于println的实现机制：如果是一个原始类型就直接打印，如果是一个类类型，则打印出其toString方法的返回值，如此而已！
+
+14. 使用package-info类为包服务
+15. + 虽然Java的每个对象都保存在堆内存中，但字符串池非常特殊，它在编译期已经决定了其存在JVM的常量池(Constant Pool)
+    + 当`String str=new String("中国");` 不会检查字符串池中是否已存在，也不会把对象放到池中。并且，str.intern()方法将检查当前的对象在对象池中是否有字面值相同的引用对象，如果有则返回池中的对象，如果没有则将str放入对象池中，并返回当前对象。
+16. `string.replaceAll`的第一个参数是正则表达式
+    + `string.replace`是replaceAll的简化版，可以传递两个string参数进行替换
+17. 对一个字符串进行拼接有三种方法：
+    + 加号 虽然编译器对加号做了优化，它会使用StringBuilder的append方法进行追加。但每次它都会创建一个StringBuilder对象，对在append完后调用toString方法。
+        `str=new StringBuilder(str).append("c").toString();`
+    + concat  前面都是在字符数组char buf[]上的原子性操作，速度很快。但最后，它return会新建一个String对象:`return new String (0, count+otherLen, buf);`
+    + StringBuidler或则StringBuffer的append方法
+18. 推荐使用正则表达式：
+   ```java 
+   Pattern pattern=Pattern.compile("\\\b\\\w+\\\b");//正则表达式对象 。Matcher matcher=pattern.matcher(str); //生存匹配器 int wordsCount=0;//记录单词数量 while(matcher.find()){ wordsCount++;} //遍历查找匹配，统计单词数量
+   ```
+   + \b表示的是一个单词的边界，它是一个位置界定符，一边为字符或数字，另一边为非字符或数字
+   + \w表示的是字符或数字
+19. 若有必要，使用变长数组。 对数组扩容：
+    + ```java 
+      public static＜T＞ T[] expandCapacity（T[] datas, int newLen）{ 
+        //不能是负值
+        newLen=newLen＜0?0：newLen； 
+        //生成一个新数组，并拷贝原值 
+        return Arrays.copyOf（datas, newLen）； }
+      ```
+    + 注意copyOf是浅拷贝
+20. 在明确的场景下，为集合指定初始容量
+    + ArraryList的elementDate数组的默认长度是10，之后1.5倍扩容，16、25 ...
+    + 推荐： `new ArrayList<Student> (75)`
+21. + 查找最大值
+    + + 自行实现，在in[] data 上遍历，查找最大值
+    + + 使用Arrarys 先排序，后取值 Arrays.sort(data.clone()); return data[data.length-1];   先使用data.clone拷贝是因为输入的数组也是一个对象，不拷贝的化，会改变原有数组元素的顺序。
+    + 查找倒数第二大的值。 因为最大值可能有多个，所以上面的方法行不通。
+    + + 数组不能剔除重复数据，但Set集合却可以。并且子类TreeSet还能自动排序。
+    + + ​
+      ```java
+        public static int getSecond（Integer[]data）{ //转换为列表
+          List＜Integer＞ dataList=Arrays.asList（data）；
+            //转换为TreeSet，删除重复元素并升序排列
+            TreeSet＜Integer＞ts=new TreeSet＜Integer＞（dataList）； //取得比最大值小的最大值，也就是老二了 
+            return ts.lower（ts.last（））；
+             }
+      ```
+
+22. 避免基本类型数组转化成列表时的陷阱
+    + Arrays.asList的输入参数为一个泛型变长参数
+    + 8个基本类型是不能泛型化的。
+    + int[] a 数组是一个对象，是可以泛型化的。 所以Arrays.asList(a)；没有报错，并且将整个数组作为list的第一个元素了。 因此要使用Integer[] a ={1,2,3,4,5};
+23. asList方法产生的List对象不可更改
+    + Arrays工具类的asList方法的源码：
+    ```java 
+    public static＜T＞ List＜T＞ asList（T……a）{ 
+        return new ArrayList＜T＞（a）；
+      } 
+    ```
+       直接new了一个ArrayList对象返回，难道ArrayList不支持add方法？问题就出在这个ArrayList类上，此ArrayList非`java.util.ArrayList`，而是Arrays工具类的一个静态私有内部类。它仅仅实现了5个方法：size,toArray,get,set,contains。没有add,remove。若强行调用add，将调用其父类AbstractList的add方法，其直接抛出UnsupportedOperationException
+    + 总结，asList生成的list，只能用来读操作
+
+24. ArrayList数组实现了RandomAccess接口（随机存取接口），这也就标志着ArrayList是一个可以随机存取的列表。在Java中，RandomAccess和Cloneable、Serializable一样，都是标志性接口，不需要任何实现，只是用来表明其实现类具有某种特质的，实现了Cloneable表明可以被拷贝，实现了Serializable接口表明被序列化了，实现了RandomAccess则表明这个类可以随机存取，对我们的ArrayList来说也就标志着其数据元素之间没有关联，即两个位置相邻的元素之间没有相互依赖和索引关系，可以随机访问和存储。
+    + 因此，使用下标遍历arrayList效率非常高，而使用foreach则是使用的iterator非常耗时
+    + LinkedList不是随机存取的，且前后数据项有引用，使用foreach非常快。而用下标非常慢
+25. 列表间相等判断只关心所拥有的元素数据
+    + ArrayList、Vector都继承了AbstractList抽象类，它的equals方法只要求所有元素相等，个数一致。
+    + 其他的集合类型，如Set、Map等与此相同，也是只关心集合元素，不用考虑集合类型
+
+26. 子列表只是原列表的一个视图。list.subList的源码：
+    + ```java
+      public List＜E＞ subList（int fromIndex, int toIndex）{
+      return（this instanceof RandomAccess ? new RandomAccessSubList＜E＞（this, fromIndex, toIndex）：new SubList＜E＞（this, fromIndex, toIndex））； } 
+      ```
+
+    subList方法是由AbstractList实现的，它会根据是不是可以随机存取来提供不同的SubList实现方式，不过，随机存储的使用频率比较高，而且RandomAccessSubList也是SubList子类，所以所有的操作都是由SubList类实现的（除了自身的SubList方法外），并且SubList也是继承了AbstractList。（阅读源码）subList类没有新建一个新的数组或列表。
+27. 巧用subList处理局部列表。eg:删除索引位置为20~30的元素。`list.subList(20,30).clear();`
+
+28. 生成子列表后不要再操作原列表。子列表调用size()方法，将调用checkForComodifcation方法。
+    + ```java
+      private void checkForComodification（）{ //判断当前修改计数器是否与子列表生成时一致
+      if（l.modCount！=expectedModCount） 
+        throw new ConcurrentModificationException（）； }
+      ```
+      expectedModCount是从什么地方来的呢？它是在SubList子列表的构造函数中赋值的，其值等于生成子列表时的修改次数（modCount变量）。因此在生成子列表后再修改原始列表，l.modCount的值就必然比expectedModCount大1，不再保持相等了，于是也就抛出了ConcurrentModificationException异常。
+    + subList的其他方法也会检测修改计数器，例如set、get、add等方法，若生成子列表后，再修改原列表，这些方法也会抛出ConcurrentModificationException异常。
+    + 解决办法，通过Collections.unmodifiableList方法设置原列表为只读状态，代码如下：
+      ```java
+      public static void main（String[]args）{
+          List＜String＞list=new ArrayList＜String＞（）； List＜String＞subList=list.subList（0，2）； //设置列表为只读状态 list=Collections.unmodifableList（list）； //对list进行只读操作 doReadSomething（list） //对subList进行读写操作 doReadAndWriteSomething（subList） 
+          }
+      ```
+
+    + 还有一个问题。我们的List也可以有多个视图，也就是可以有多个子列表，但==问题是只要生成的子列表多于一个，则任何一个子列表就都不能修改了==，否则就会抛出ConcurrentModificationException异常。 
+
+29. 实现Comparable接口作为类的默认排序方法。Comparator接口则是一个类的扩展排序工具。
+    + 实现Comparable接口，必须实现compareTo方法，eg:  
+      ```java
+      @Override
+        public int compareTo（Employee o）{ 
+            return new CompareToBuilder（） .append（id, o.id）.toComparison（）； }
+        @Override public String toString（）{
+            return ToStringBuilder.reflectionToString（this）； } 
+        
+      这里使用apache的工具类实现，表明是按照id的升序排列的。
+      ```
+    + 使用Collections.sort(list); 排序
+    + 但是，有时候我们希望按照职位来排序，那怎么做呢？此时，重构Employee类已经不合适了，Employee已经是一个稳定类，为了一个排序功能修改它不是一个好办法，那有什么更好的解决办法吗？  
+    + 有办法，看Collections.sort方法，它有一个重载方法Collections.sort（List＜T＞list, Comparator＜?super T＞c），可以接受一个Comparator实现类，代码如下：
+      ```java
+      class PositionComparator implements Comparator＜Employee＞{
+        @Override public int compare（Employee o1，Employee o2）{ //按照职位降序排列
+        return o1.getPosition（）.compareTo（o2.getPosition（））； } }
+      ```
+
+    + 调用`Collections.sort（list, new PositionComparator（））`即可实现按职位排序
+
+    + 按职位==临时==倒序排列，有两种简单的方法：
+    + + 直接使用`Collections.reverse（List＜?＞list）`方法实现倒序排列。 
+    + + 通过`Collections.sort（list, Collections.reverseOrder（new PositionComparator（）））`也可以实现倒序排列。
+
+     + 先按照职位排序，职位相同再按照工号排序，这如何处理？这可是我们经常遇到的实际问题。很好处理，使用apache的工具类来简化处理，代码如下：
+      ```java
+       public int compareTo（Employee o）{ 
+       return new CompareToBuilder（）.append（position, o.position）//职位排序 .append（id, o.id）.toComparison（）；//工号排序 }
+      ```
+
+30. 集合中的元素必须做到compareTo和equals同步。
+    + indexOf依赖equals方法查找，binarySearch则依赖compareTo方法查找。
+    + 在覆写euqals方法时，可以使用`return new EqualsBuilder().append(code,city.code).isEquals(); `方法，简单快速实现
+31. 集合运算时使用更优雅的方式。
+    + 并集 ： list1.addAll(list2) 把两个集合加起来
+    + 交集 ： list1.retain(list2) 会删除list1中没有出现在list2中的元素
+    + 差集 ： list1.removeAll(list2) 从1中删除出现在list2的元素
+    + 无重复并集 ： list2.removeAll(list1);  list1.addAll(list2);
+    + 集合的这些操作在持久层中使用得非常频繁，从数据库中取出的就是多个数据集合，之后我们就可以使用集合的各种方法构建我们需要的数据了，需要两个集合的and结果，那是交集，需要两个集合的or结果，那是并集，需要两个集合的not结果，那是差集。
+
+32. 使用shuffle打乱列表
+    + Collections.swap(list,i,j); 交换list中第i个元素和第j个元素
+    + Collections.shuffe(list);  直接打乱list
+
+33. + 减少HashMap中元素的数量。 hashmap底层是Entry<k,v>组成的数组，每个键值对
+      就多一个Entry对象，消耗比ArrayList多。
+    + 集合中的哈希码不要重复。 
+    + + 如果新加入的键值对的hashCode是唯一的，那直接插入的数组中，它Entry的next值则为null；如果新加入的键值对的hashCode与其他元素冲突，则替换掉数组中的当前值，并把新加入的Entry的next变量指向被替换掉的元素—于是，一个链表就生成了。
+    + + 如果哈希码相同，它的查找效率就与ArrayList没什么两样了，遍历对比，性能会大打折扣。特别是在那些进度紧张的项目中，虽重写了hashCode方法但返回值却是固定的，此时如果把这些对象插入到HashMap中，查找就相当耗时了。
+34. 多线程使用Vector和HashTable
+    + 不要混淆线程安全和同步修改异常
+    + + 基本上所有的集合类都有一个叫做快速失败（Fail-Fast）的校验机制，当一个集合在被多个线程修改并访问时，就可能会出现ConcurrentModificationException异常，这是为了确保集合方法一致而设置的保护措施，它的实现原理就是我们经常提到的modCount修改计数器：如果在读列表时，modCount发生变化（也就是有其他线程修改）则会抛出ConcurrentModificationException异常。这与线程同步是两码事，线程同步是为了保护集合中的数据不被脏读、脏写而设置的。
+    + + 注意看，有两个线程在卖同一张火车票，这才是线程不同步的问题，此时把ArrayList修改为Vector即可解决问题，因为Vector的每个方法前都加上了synchronized关键字，同时只会允许一个线程进入该方法，确保了程序的可靠性。
+    + + 虽然在系统开发中我们一再说明，除非必要，否则不要使用synchronized，这是从性能的角度考虑的，但是一旦涉及多线程时（注意这里说的是真正的多线程，不是并发修改的问题，比如一个线程增加，一个线程删除，这不属于多线程的范畴），Vector会是最佳选择，当然自己在程序中加synchronized也是可行的方法。
+
+35. 非基本类型的元素、后期会修改数据的、希望实现自动排序的 推荐使用List
+    + Treeset实现了SortedSet接口。但该接口只是在加入元素时才进行排序，后期修改数据，不会重新排序。因此，TreeSet使用于不变量的集合数据排序，比如String、Integer等类型。如何解决后期TreeSet的数据修改，没有自己重新排序的问题呢？
+    + + 1. Set集合重排序 set=new TreeSet＜Person＞（new ArrayList＜Person＞（set））；就这一句话即可重新排序。可能有读者会问，使用TreeSet（SortedSet＜E＞s）这个构造函数不是可以更好地解决问题吗？不行，该构造函数只是原Set的浅拷贝，如果里面有相同的元素，是不会重新排序的。
+    + + 2. 彻底重构掉TreeSet，使用List解决问题。当需要排序时，使用Colletions.sort()方法
+
+    + 两种方法都可以解决我们的困境，到底哪一个是最优的呢？对于不变量的排序，例如直接量（也就是8个基本类型）、String类型等，推荐使用TreeSet，而对于可变量，例如我们自己写的类，可能会在逻辑处理中改变其排序关键值的，则建议使用List自行排序。
